@@ -7,6 +7,10 @@ const numeroDeDiasDePre = ref('0');
 const numeroDeCaracteres = ref('0');
 const numeroDeHoras = ref('00h00');
 
+//experimental
+const dataDeEntregaCopiado = ref('content_copy');
+const dataDeEntrega = ref('');
+
 const diasCopiado = ref('content_copy');
 const caracteresCopiado = ref('content_copy');
 const horasCopiado = ref('content_copy');
@@ -38,14 +42,39 @@ const calcPre = () => {
   numeroDeDiasDePre.value = Math.ceil(numeroDeCaracteresCalculado / 76000);
 };
 
+//experimental
+
+const calcHour = () => {
+  const baseDaCronometria = numeroDeDiasDePre.value;
+  const baseDeCalculoParaFeriados = Math.floor(baseDaCronometria / 5);
+  const feriadosCompensados =
+    baseDeCalculoParaFeriados * 2 + baseDaCronometria - 1;
+
+  const hoje = new Date();
+  let base = new Date();
+
+  const futuro = base.setDate(hoje.getDate() + feriadosCompensados);
+  const formatado = new Intl.DateTimeFormat('pt-BR', {
+    day: 'numeric',
+    weekday: 'long',
+    month: 'short',
+    year: 'numeric',
+  }).format(futuro);
+  dataDeEntrega.value = formatado;
+};
+
+//experimental
+
 const imprimirCalc = () => {
   if (inputText.value == '') return;
   calcCaracter();
   calcHoras();
   calcPre();
+  calcHour();
   diasCopiado.value = 'content_copy';
   caracteresCopiado.value = 'content_copy';
   horasCopiado.value = 'content_copy';
+  dataDeEntregaCopiado.value = 'content_copy';
 };
 
 const copiar = (n, m) => {
@@ -63,6 +92,9 @@ const copiar = (n, m) => {
     },
     function () {
       horasCopiado.value = 'file_copy';
+    },
+    function () {
+      dataDeEntregaCopiado.value = 'file_copy';
     },
   ];
   funcoesDeSimbolos[m]();
@@ -103,6 +135,14 @@ const copiar = (n, m) => {
       </button>
     </div>
 
+    <div class="subCard">
+      <p>Data de entrega: {{ dataDeEntrega }}</p>
+      <button @click="copiar(dataDeEntrega, 3)">
+        <span class="material-symbols-outlined">
+          {{ dataDeEntregaCopiado }}
+        </span>
+      </button>
+    </div>
     <div class="footer">
       <p class="header">
         Valor copiado para área de transferência: {{ copiado }}
@@ -149,6 +189,7 @@ button:focus {
 .subCard {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 5px;
 }
 
