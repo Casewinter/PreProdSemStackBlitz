@@ -152,7 +152,7 @@ const copiar = (n, m) => {
     <h4>De onde vem nossas métricas?</h4>
     <p class="text">
       Sabemos que 48 mil caracteres são normalmente o que um narrador lê por
-      horas. Usamos 800 para calcular um minuto de áudio. Sabemos que o GOT teve
+      hora. Usamos 800 para calcular um minuto de áudio. Sabemos que o GOT teve
       uma média arrendonda para baixo de 76 mil caracteres de pré por dia, ou
       seja => caracteres totais / 76.0000.
     </p>
