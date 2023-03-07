@@ -5,7 +5,7 @@ const inputText = ref('');
 
 const numeroDeDiasDePre = ref('0');
 const numeroDeCaracteres = ref('0');
-const numeroDeHoras = ref('0');
+const numeroDeHoras = ref('00h00');
 
 const diasCopiado = ref('content_copy');
 const caracteresCopiado = ref('content_copy');
