@@ -1,6 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { inject } from '@vercel/analytics';
 
+import { ref } from 'vue';
+ 
+inject(); //vercel analytics
 const inputText = ref('');
 
 const numeroDeDiasDePre = ref('0');
