@@ -1,32 +1,32 @@
 <script setup>
-import { inject } from '@vercel/analytics';
+import { inject } from "@vercel/analytics";
 
-import { ref } from 'vue';
- 
+import { ref } from "vue";
+
 inject(); //vercel analytics
-const inputText = ref('');
+const inputText = ref("");
 
-const numeroDeDiasDePre = ref('0');
-const numeroDeCaracteres = ref('0');
-const numeroDeHoras = ref('00h00');
+const numeroDeDiasDePre = ref("0");
+const numeroDeCaracteres = ref("0");
+const numeroDeHoras = ref("00h00");
 
 //experimental
-const dataDeEntregaCopiado = ref('content_copy');
-const dataDeEntrega = ref('');
+const dataDeEntregaCopiado = ref("content_copy");
+const dataDeEntrega = ref("");
 //experimental
 
-const diasCopiado = ref('content_copy');
-const caracteresCopiado = ref('content_copy');
-const horasCopiado = ref('content_copy');
+const diasCopiado = ref("content_copy");
+const caracteresCopiado = ref("content_copy");
+const horasCopiado = ref("content_copy");
 
-const copiado = ref('');
+const copiado = ref("");
 
-let numeroDeCaracteresCalculado = '';
+let numeroDeCaracteresCalculado = "";
 
 const calcCaracter = () => {
   numeroDeCaracteresCalculado = inputText.value.length;
   numeroDeCaracteres.value = numeroDeCaracteresCalculado.toLocaleString();
-  inputText.value = '';
+  inputText.value = "";
 };
 
 const calcHoras = () => {
@@ -37,9 +37,9 @@ const calcHoras = () => {
   const minutes = totalMinutes % 60;
   const hours = Math.floor(totalMinutes / 60);
 
-  numeroDeHoras.value = `${String(hours).padStart(2, '0')}h${String(
+  numeroDeHoras.value = `${String(hours).padStart(2, "0")}h${String(
     minutes
-  ).padStart(2, '0')}`;
+  ).padStart(2, "0")}`;
 };
 
 const calcPre = () => {
@@ -48,64 +48,176 @@ const calcPre = () => {
 
 //experimental
 
-const calcHour = () => {
-  const baseDaCronometria = numeroDeDiasDePre.value;
-  const baseDeCalculoParaFeriados = Math.floor(baseDaCronometria / 5);
-  const feriadosCompensados =
-    baseDeCalculoParaFeriados * 2 + baseDaCronometria - 1;
+const weekendDataBase = [
+  {
+    date: "4/7/23",
+    name: "Sexta-Feira Santa",
+    level: "Feriado Nacional",
+    nationalDate: '7/4/23'
+  },
+  {
+    date: "4/21/23",
+    name: "Dia de Tiradentes",
+    level: "Feriado Nacional",
+    nationalDate: '21/4/23'
+  },
+  {
+    date: "5/1/23",
+    name: "Dia do Trabalho",
+    level: "Feriado Nacional",
+    nationalDate: '1/5/23'
+  },
+  {
+    date: "6/8/23",
+    name: "Corpus Christi",
+    level: "Feriado municipal",
+    nationalDate: '8/6/23'
+  },
+  {
+    date: "7/9/23",
+    name: "Revolução Constitucionalista",
+    level: "Feriado Estadual",
+    nationalDate: '9/7/23'
+  },
+  {
+    date: "9/7/23",
+    name: "Independência do Brasil",
+    level: "Feriado Nacional",
+    nationalDate: '7/9/23'
+  },
+  {
+    date: "10/12/23",
+    name: "Nossa Senhora Aparecida",
+    level: "Feriado Nacional",
+    nationalDate: '12/10/23'
+  },
+  {
+    date: "11/2/23",
+    name: "Dia de Finados",
+    level: "Feriado Nacional",
+    nationalDate: '2/11/23'
+  },
+  {
+    date: "11/15/23",
+    name: "Proclamação da República",
+    level: "Feriado Nacional",
+    nationalDate: '15/11/23'
+  },
+  {
+    date: "11/20/23",
+    name: "Dia da Consciência Negra",
+    level: "Feriado Municipal",
+    nationalDate: '20/11/23'
+  },
+];
+const printWeekends = ref([{
+  name: 'Exemplo',
+  nationalDate: '1/1/23'
+}]); 
 
-  const hoje = new Date();
-  let base = new Date();
+const compensarFeriados = (a, future) => {
+  const toDay = a.getTime();
 
-  let futuro = base.setDate(hoje.getDate() + feriadosCompensados);
+  const tester = (n) => {
+    const time = new Date(n["date"]).getTime();
+    if (toDay < time && future > time) return true;
+  };
 
-  if(futuro.getDay() == 6){
-    futuro = base.setDate(hoje.getDate() + feriadosCompensados + 2) 
-  } else if(futuro.getDay() == 7){
-    futuro = base.setDate(hoje.getDate() + feriadosCompensados + 1) 
-  }
 
-  const formatado = new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric',
-    weekday: 'long',
-    month: 'short',
-    year: 'numeric',
-  }).format(futuro);
-  dataDeEntrega.value = formatado;
+  const daysFiltered = weekendDataBase.filter(tester);
+
+  printWeekends.value= daysFiltered
+  return daysFiltered.length;
 };
+
+
+
+const finalDate = (future, count, daysOff) => {
+  const toDayForFutureCount = new Date();
+  const futureDateForTester = toDayForFutureCount.setDate(
+    new Date(future).getDate() + daysOff + count
+  );
+
+  const weekDay = new Date(futureDateForTester).getDay();
+
+  if (weekDay == 7) {
+    return toDayForFutureCount.setDate(
+      new Date(future).getDate() + daysOff + count + 1
+    );
+  } else if (weekDay == 6) {
+    console.log("rodei");
+    return toDayForFutureCount.setDate(
+      new Date(future).getDate() + daysOff + count + 2
+    );
+  }
+ 
+  return futureDateForTester;
+};
+
+
+
+const calcDate = () => {
+  const days = numeroDeDiasDePre.value;
+  const daysForWeekends = Math.floor(days / 5);
+  const weekendsCounted = daysForWeekends * 2 + days - 1;
+
+  const toDay = new Date();
+  const toDayForFutureCount = new Date();
+
+  const futureDateForTester = toDayForFutureCount.setDate(
+    toDay.getDate() + weekendsCounted
+  );
+
+  const setDaysOff = compensarFeriados(toDay, futureDateForTester);
+
+  const resultOfDaysOff = finalDate(
+    futureDateForTester,
+    weekendsCounted,
+    setDaysOff
+  );
+  const formated = new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    weekday: "long",
+    month: "short",
+    year: "numeric",
+  }).format(resultOfDaysOff);
+  dataDeEntrega.value = formated;
+
+};
+
 
 //experimental
 
 const imprimirCalc = () => {
-  if (inputText.value == '') return;
+  if (inputText.value == "") return;
   calcCaracter();
   calcHoras();
   calcPre();
-  calcHour();
-  diasCopiado.value = 'content_copy';
-  caracteresCopiado.value = 'content_copy';
-  horasCopiado.value = 'content_copy';
-  dataDeEntregaCopiado.value = 'content_copy';
+  calcDate();
+  diasCopiado.value = "content_copy";
+  caracteresCopiado.value = "content_copy";
+  horasCopiado.value = "content_copy";
+  dataDeEntregaCopiado.value = "content_copy";
 };
 
 const copiar = (n, m) => {
   navigator.clipboard
     .writeText(n)
-    .then(() => console.log('Texto copiado com sucesso!'))
-    .catch((err) => console.error('Falha ao copiar o texto:', err));
+    .then(() => console.log("Texto copiado com sucesso!"))
+    .catch((err) => console.error("Falha ao copiar o texto:", err));
 
   const funcoesDeSimbolos = [
     function () {
-      diasCopiado.value = 'file_copy';
+      diasCopiado.value = "file_copy";
     },
     function () {
-      caracteresCopiado.value = 'file_copy';
+      caracteresCopiado.value = "file_copy";
     },
     function () {
-      horasCopiado.value = 'file_copy';
+      horasCopiado.value = "file_copy";
     },
     function () {
-      dataDeEntregaCopiado.value = 'file_copy';
+      dataDeEntregaCopiado.value = "file_copy";
     },
   ];
   funcoesDeSimbolos[m]();
@@ -154,6 +266,17 @@ const copiar = (n, m) => {
         </span>
       </button>
     </div>
+  <div class='date'>
+  
+    <p> Se houver feriados entre os dias de pré você os verá aqui! </p>
+    <ul>
+      <li v-for="n in printWeekends">
+        Nome do feriado: {{ n.name }}
+        Data: {{ n.nationalDate }}
+      </li>
+    </ul>
+
+  </div>
     <div class="footer">
       <p class="header">
         Valor copiado para área de transferência: {{ copiado }}
@@ -211,5 +334,14 @@ button:focus {
 
 .text {
   text-align: justify;
+}
+
+li{
+  list-style: none;
+}
+
+.date{
+  margin: 10px 0px;
+  text-align: start;
 }
 </style>
