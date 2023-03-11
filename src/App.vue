@@ -13,6 +13,7 @@ const numeroDeHoras = ref('00h00');
 //experimental
 const dataDeEntregaCopiado = ref('content_copy');
 const dataDeEntrega = ref('');
+//experimental
 
 const diasCopiado = ref('content_copy');
 const caracteresCopiado = ref('content_copy');
@@ -56,7 +57,14 @@ const calcHour = () => {
   const hoje = new Date();
   let base = new Date();
 
-  const futuro = base.setDate(hoje.getDate() + feriadosCompensados);
+  let futuro = base.setDate(hoje.getDate() + feriadosCompensados);
+
+  if(futuro.getDay() == 6){
+    futuro = base.setDate(hoje.getDate() + feriadosCompensados + 2) 
+  } else if(futuro.getDay() == 7){
+    futuro = base.setDate(hoje.getDate() + feriadosCompensados + 1) 
+  }
+
   const formatado = new Intl.DateTimeFormat('pt-BR', {
     day: 'numeric',
     weekday: 'long',
