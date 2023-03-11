@@ -112,6 +112,7 @@ const weekendDataBase = [
 ];
 const printWeekends = ref([{
   name: 'Exemplo',
+  level: "Feriado Nacional",
   nationalDate: '1/1/23'
 }]); 
 
@@ -271,8 +272,8 @@ const copiar = (n, m) => {
     <p> Se houver feriados entre os dias de pré você os verá aqui! </p>
     <ul>
       <li v-for="n in printWeekends">
-        Nome do feriado: {{ n.name }}
-        Data: {{ n.nationalDate }}
+        Nome do feriado: {{ n.name }} - 
+            Data: {{ n.nationalDate }} - {{ n.level}}
       </li>
     </ul>
 
